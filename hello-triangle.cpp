@@ -2,6 +2,18 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fstream>
+#include <string>
+#include <iostream>
+
+void read_file(const char * file, std::string & content) {
+    std::ifstream ifs(file);
+    std::string line;
+    while(std::getline(ifs, line)) {
+        content += line + "\n";
+    }
+}
+
 
 int main() {
     if(!glfwInit()) {
@@ -43,24 +55,19 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    const char * vertex_shader =
-        "#version 410\n"
-        "in vec3 vp;"
-        "void main() {"
-        "   gl_Position = vec4(vp, 1.0);"
-        "}";
-    const char * fragement_shader =
-        "#version 410\n"
-        "out vec4 frag_colour;"
-        "void main() {"
-        "   frag_colour = vec4(0.5, 0.0, 0.5, 1.0);"
-        "}";
+    std::string vertex_shader_file;
+    read_file("./test.vert", vertex_shader_file);
+    const char * vertex_shader = vertex_shader_file.c_str();
 
+    std::string fragment_shader_file;
+    read_file("./test.frag", fragment_shader_file);
+    const char * fragment_shader = fragment_shader_file.c_str();
+    
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertex_shader, NULL);
     glCompileShader(vs);
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragement_shader, NULL);
+    glShaderSource(fs, 1, &fragment_shader, NULL);
     glCompileShader(fs);
     GLuint shader_programme = glCreateProgram();
     glAttachShader(shader_programme, fs);
