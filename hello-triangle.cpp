@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 
+
 void read_file(const char * file, std::string & content) {
     std::ifstream ifs(file);
     std::string line;
@@ -38,9 +39,13 @@ int main() {
 
     /* Other stuff goes here*/
     GLfloat points [] = {
-        0.0f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-       -0.5f, -0.5f, 0.0f
+         0.6f,  0.6f, 0.0f,
+        -0.6f, -0.6f, 0.0f,
+        -0.6f,  0.6f, 0.0f,
+
+         0.6f,  0.6f, 0.0f,
+         0.6f, -0.6f, 0.0f,
+        -0.6f, -0.6f, 0.0f,
     };
 
     GLuint vbo = 0;
@@ -80,7 +85,7 @@ int main() {
         glUseProgram(shader_programme);
         glBindVertexArray(vao);
         // draw points 0-3 from the currently bound VAO with current in-use shader
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         // update other events like input handling
         glfwPollEvents();
         // put the stuff we've been drawing onto the display
