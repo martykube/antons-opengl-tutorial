@@ -38,14 +38,15 @@ int main() {
     glDepthFunc(GL_LESS);
 
     /* Other stuff goes here*/
+    float size = 0.2;
     GLfloat points [] = {
-         0.6f,  0.6f, 0.0f,
-        -0.6f, -0.6f, 0.0f,
-        -0.6f,  0.6f, 0.0f,
+         size,  size, 0.0f,
+        -size, -size, 0.0f,
+        -size,  size, 0.0f,
 
-         0.6f,  0.6f, 0.0f,
-         0.6f, -0.6f, 0.0f,
-        -0.6f, -0.6f, 0.0f,
+         size,  size, 0.0f,
+         size, -size, 0.0f,
+        -size, -size, 0.0f,
     };
 
     GLuint vbo = 0;
@@ -71,9 +72,11 @@ int main() {
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertex_shader, NULL);
     glCompileShader(vs);
+
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, &fragment_shader, NULL);
     glCompileShader(fs);
+
     GLuint shader_programme = glCreateProgram();
     glAttachShader(shader_programme, fs);
     glAttachShader(shader_programme, vs);
