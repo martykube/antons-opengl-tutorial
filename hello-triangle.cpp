@@ -5,7 +5,26 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "gllogging.h"
 
+// window
+int g_window_width = 640;
+int g_window_height = 480;
+// framebuffer
+int g_fb_width = 640;
+int g_fb_height = 480;
+
+void gflw_window_size_callback(GLFWwindow* window, int width, int height) {
+    gl_log("GLFW: window size: %i x %i\n", width, height);
+    g_window_width = width;
+    g_window_height = height;
+}
+
+void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    gl_log("GLFW: framebuffer size: %i x %i\n", width, height);
+    g_fb_width = width;
+    g_fb_height = height;
+}
 
 void read_file(const char * file, std::string & content) {
     std::ifstream ifs(file);
@@ -15,25 +34,63 @@ void read_file(const char * file, std::string & content) {
     }
 }
 
+void glfw_error_callback(int error, const char* description) {
+    gl_log_err("GLFW ERROR: code %i msg: %s\n", error, description);
+}
+
+double previous_seconds = 0;
+int frame_count = 0;
+
+void _update_fps_counter(GLFWwindow* window) {
+    double current_seconds;
+    double elapsed_seconds;
+    current_seconds = glfwGetTime();
+    elapsed_seconds = current_seconds - previous_seconds;
+    if(elapsed_seconds > 0.25) {
+        previous_seconds = current_seconds;
+        double fps = (double)frame_count / elapsed_seconds;
+        char tmp[128];
+        sprintf(tmp, "opengl @ fps: %.2f", fps);
+        glfwSetWindowTitle(window, tmp);
+        frame_count = 0;
+    }
+    frame_count++;
+}
 
 int main() {
-    if(!glfwInit()) {
-        fprintf(stderr, "Failed to initialize GLFW3\n");
+    if(!restart_gl_log()) {
+        fprintf(stderr, "Failed to open log file\n");
         return 1;
     }
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Hello Triangle", NULL, NULL);
+    gl_log("Starting GLFW: %s\n", glfwGetVersionString());
+    glfwSetErrorCallback(glfw_error_callback);
+    if(!glfwInit()) {
+        fprintf(stderr, "Failed to initialize GLFW3\n");
+        return 2;
+    }
+
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* vmode = glfwGetVideoMode(monitor);
+    GLFWwindow* window = glfwCreateWindow(vmode->width, vmode->height,
+        "Extended GL Init", monitor, NULL);
     if(!window){
         fprintf(stderr, "Failed to open GLFW3 window\n");
         glfwTerminate();
-        return 1;
+        return 3;
     }
+    glfwSetWindowSizeCallback(window, gflw_window_size_callback);
+    glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
     glfwMakeContextCurrent(window);
+
     glewExperimental = true;
     glewInit();
+
     const GLubyte* renderer = glGetString(GL_RENDERER);
     const GLubyte* version = glGetString(GL_VERSION);
     printf("Renderer: %s\n", renderer);
     printf("OpenGL version supported %s\n", version);
+    log_gl_params();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -84,17 +141,24 @@ int main() {
 
     glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     while(!glfwWindowShouldClose(window)) {
+        _update_fps_counter(window);
         // wipe the drawing surface clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, g_fb_width, g_fb_height);
+
         glUseProgram(shader_programme);
         glBindVertexArray(vao);
         // draw points 0-3 from the currently bound VAO with current in-use shader
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // update other events like input handling
+
         glfwPollEvents();
         // put the stuff we've been drawing onto the display
         glfwSwapBuffers(window);
         // usleep(10000);
+        if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+            glfwSetWindowShouldClose(window, 1);
+        }
     }
 
 
