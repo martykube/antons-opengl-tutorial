@@ -72,8 +72,8 @@ int main() {
     glfwWindowHint(GLFW_SAMPLES, 4);
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* vmode = glfwGetVideoMode(monitor);
-    GLFWwindow* window = glfwCreateWindow(vmode->width, vmode->height,
-        "Extended GL Init", monitor, NULL);
+    // GLFWwindow* window = glfwCreateWindow(vmode->width, vmode->height, "Extended GL Init", monitor, NULL);
+    GLFWwindow* window = glfwCreateWindow(vmode->width, vmode->height, "HelloWindow", NULL, NULL);
     if(!window){
         fprintf(stderr, "Failed to open GLFW3 window\n");
         glfwTerminate();
@@ -100,12 +100,15 @@ int main() {
          size,  size, 0.0f,
         -size, -size, 0.0f,
         -size,  size, 0.0f,
-
-         size,  size, 0.0f,
-         size, -size, 0.0f,
-        -size, -size, 0.0f,
+    };
+    float offset = 1;
+    GLfloat points2 [] = {
+         size + offset,  size, 0.0f,
+         size + offset, -size, 0.0f,
+        -size + offset, -size, 0.0f,
     };
 
+    // points
     GLuint vbo = 0;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -116,6 +119,19 @@ int main() {
     glBindVertexArray(vao);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    // points2
+    GLuint vbo2 = 0;
+    glGenBuffers(1, &vbo2);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points2), points2, GL_STATIC_DRAW);
+
+    GLuint vao2 = 0;
+    glGenVertexArrays(1, &vao2);
+    glBindVertexArray(vao2);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo2);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     std::string vertex_shader_file;
@@ -147,9 +163,16 @@ int main() {
         glViewport(0, 0, g_fb_width, g_fb_height);
 
         glUseProgram(shader_programme);
-        glBindVertexArray(vao);
+        
         // draw points 0-3 from the currently bound VAO with current in-use shader
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(vao);
+        // glDrawArrays(GL_TRIANGLES, 0, 3);
+        glPointSize(40.0f);
+        glDrawArrays(GL_POINTS, 0, 3);
+
+        glBindVertexArray(vao2);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         // update other events like input handling
 
         glfwPollEvents();
