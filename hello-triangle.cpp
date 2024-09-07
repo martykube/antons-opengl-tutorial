@@ -135,11 +135,11 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     std::string vertex_shader_file;
-    read_file("./test.vert", vertex_shader_file);
+    read_file("./hello-triangle..vert", vertex_shader_file);
     const char * vertex_shader = vertex_shader_file.c_str();
 
     std::string fragment_shader_file;
-    read_file("./test.frag", fragment_shader_file);
+    read_file("./hello-triangle..frag", fragment_shader_file);
     const char * fragment_shader = fragment_shader_file.c_str();
     
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
@@ -174,8 +174,8 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // update other events like input handling
-
         glfwPollEvents();
+        
         // put the stuff we've been drawing onto the display
         glfwSwapBuffers(window);
         // usleep(10000);
