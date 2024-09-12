@@ -14,13 +14,13 @@ int g_window_height = 480;
 int g_fb_width = 640;
 int g_fb_height = 480;
 
-void gflw_window_size_callback(GLFWwindow* window, int width, int height) {
+void window_size_callback(GLFWwindow* window, int width, int height) {
     gl_log("GLFW: window size: %i x %i\n", width, height);
     g_window_width = width;
     g_window_height = height;
 }
 
-void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     gl_log("GLFW: framebuffer size: %i x %i\n", width, height);
     g_fb_width = width;
     g_fb_height = height;
@@ -34,7 +34,7 @@ void read_file(const char * file, std::string & content) {
     }
 }
 
-void glfw_error_callback(int error, const char* description) {
+void error_callback(int error, const char* description) {
     gl_log_err("GLFW ERROR: code %i msg: %s\n", error, description);
 }
 
@@ -44,7 +44,7 @@ int main() {
         return 1;
     }
     gl_log("Starting GLFW: %s\n", glfwGetVersionString());
-    glfwSetErrorCallback(glfw_error_callback);
+    glfwSetErrorCallback(error_callback);
     if(!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW3\n");
         return 2;
@@ -60,8 +60,8 @@ int main() {
         glfwTerminate();
         return 3;
     }
-    glfwSetWindowSizeCallback(window, gflw_window_size_callback);
-    glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwMakeContextCurrent(window);
 
     glewExperimental = true;
