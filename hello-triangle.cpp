@@ -38,25 +38,6 @@ void glfw_error_callback(int error, const char* description) {
     gl_log_err("GLFW ERROR: code %i msg: %s\n", error, description);
 }
 
-double previous_seconds = 0;
-int frame_count = 0;
-
-void _update_fps_counter(GLFWwindow* window) {
-    double current_seconds;
-    double elapsed_seconds;
-    current_seconds = glfwGetTime();
-    elapsed_seconds = current_seconds - previous_seconds;
-    if(elapsed_seconds > 0.25) {
-        previous_seconds = current_seconds;
-        double fps = (double)frame_count / elapsed_seconds;
-        char tmp[128];
-        sprintf(tmp, "opengl @ fps: %.2f", fps);
-        glfwSetWindowTitle(window, tmp);
-        frame_count = 0;
-    }
-    frame_count++;
-}
-
 int main() {
     if(!restart_gl_log()) {
         fprintf(stderr, "Failed to open log file\n");

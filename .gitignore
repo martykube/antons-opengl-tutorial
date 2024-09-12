@@ -4,3 +4,4 @@ glew
 glfw
 hello-triangle
 gl.log
+shader-minimal
