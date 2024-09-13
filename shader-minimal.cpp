@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-#include "gllogging.h"
+#include "logging.h"
 #include "shadermanager.h"
 
 
@@ -96,9 +96,9 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     GLuint shader_programme = get_shader_program();
-    GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
     glUseProgram(shader_programme);
-    glUniform4f(uniform_location, 0.0f, 1.0f, 0.0f, 1.0f);
+    GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
+    glUniform4f(uniform_location, 1.0f, 0.0f, 0.0f, 1.0f);
 
     glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     while(!glfwWindowShouldClose(window)) {
@@ -108,6 +108,8 @@ int main() {
         glViewport(0, 0, g_fb_width, g_fb_height);
 
         glUseProgram(shader_programme);
+        GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
+        glUniform4f(uniform_location, 0.0f, 0.0f, 1.0f, 1.0f);
         
         // draw points 0-3 from the currently bound VAO with current in-use shader
         glBindVertexArray(vao);
@@ -121,7 +123,9 @@ int main() {
         // put the stuff we've been drawing onto the display
         glfwSwapBuffers(window);
         usleep(10000);
-        if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+
+        if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_ESCAPE) ||
+            GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Q)) {
             glfwSetWindowShouldClose(window, 1);
         }
         if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R)) {

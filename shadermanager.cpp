@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-#include "gllogging.h"
+#include "logging.h"
 #include "shadermanager.h"
 
 
@@ -105,6 +105,7 @@ void show_shader(GLuint program) {
 
 
 GLuint get_shader_program() {
+    gl_log("Loading shaders\n");
     std::string vertex_shader_file;
     read_file("./shader-minimal.vert", vertex_shader_file);
     const char * vertex_shader = vertex_shader_file.c_str();
