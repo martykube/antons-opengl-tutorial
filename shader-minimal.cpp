@@ -17,6 +17,8 @@ int g_window_height = 480;
 int g_fb_width = 640;
 int g_fb_height = 480;
 
+GLuint shader_programme;
+
 void window_size_callback(GLFWwindow* window, int width, int height) {
     gl_log("GLFW: window size: %i x %i\n", width, height);
     g_window_width = width;
@@ -32,6 +34,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void error_callback(int error, const char* description) {
     gl_log_err("GLFW ERROR: code %i msg: %s\n", error, description);
 }
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+        shader_programme = get_shader_program();
+    }
+    if(action == GLFW_PRESS && (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q)) {
+        glfwSetWindowShouldClose(window, 1);
+    }
+ }
 
 int main() {
     // start GL context and O/S window using the GLFW helper library
@@ -58,6 +69,7 @@ int main() {
     }
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
 
     // start GLEW extension handler
@@ -95,10 +107,12 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    GLuint shader_programme = get_shader_program();
+    shader_programme = get_shader_program();
     glUseProgram(shader_programme);
-    GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
-    glUniform4f(uniform_location, 1.0f, 0.0f, 0.0f, 1.0f);
+    if(!uniform_location(shader_programme, "input_color", 0.0f, 0.0f, 1.0f, 1.0f)) {
+        gl_log_err("ERROR: could not set uniform location\n");
+        return 5;
+    }
 
     glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     while(!glfwWindowShouldClose(window)) {
@@ -108,8 +122,12 @@ int main() {
         glViewport(0, 0, g_fb_width, g_fb_height);
 
         glUseProgram(shader_programme);
-        GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
-        glUniform4f(uniform_location, 0.0f, 0.0f, 1.0f, 1.0f);
+        if(!uniform_location(shader_programme, "input_color", 0.0f, 0.0f, 1.0f, 1.0f)) {
+            gl_log_err("ERROR: could not set uniform location\n");
+            return 6;
+        }
+        // GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
+        // glUniform4f(uniform_location, 0.0f, 0.0f, 1.0f, 1.0f);
         
         // draw points 0-3 from the currently bound VAO with current in-use shader
         glBindVertexArray(vao);
@@ -123,14 +141,6 @@ int main() {
         // put the stuff we've been drawing onto the display
         glfwSwapBuffers(window);
         usleep(10000);
-
-        if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_ESCAPE) ||
-            GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Q)) {
-            glfwSetWindowShouldClose(window, 1);
-        }
-        if(GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R)) {
-            shader_programme = get_shader_program();
-        }
     }
 
     // close GL context and any other GLFW resources
