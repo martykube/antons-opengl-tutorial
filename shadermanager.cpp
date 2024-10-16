@@ -104,6 +104,37 @@ void show_shader(GLuint program) {
 }
 
 
+void print_all(GLuint programe) {
+    printf("----------------\nshader programme %i info:\n", programe);
+    int params = -1;
+    glGetProgramiv(programe, GL_LINK_STATUS, &params);
+    printf("GL_LINK_STATUS = %i\n", params);
+    glGetProgramiv(programe, GL_ATTACHED_SHADERS, &params);
+    printf("GL_ATTACHED_SHADERS = %i\n", params);
+    glGetProgramiv(programe, GL_ACTIVE_ATTRIBUTES, &params);
+    printf("GL_ACTIVE_ATTRIBUTES = %i\n", params);
+    for(GLuint i = 0; i < (GLuint)params; i++) {
+        char name[64];
+        int max_length = 64;
+        int actual_length = 0;
+        int size = 0;
+        GLenum type;
+        glGetActiveAttrib(programe, i, max_length, &actual_length, &size, &type, name);
+        if(size > 1) {
+            for(int j = 0; j < size; j++) {
+                char long_name[100];
+                sprintf(long_name, "%s[%i]", name, j);
+                int location = glGetAttribLocation(programe, long_name);
+                printf("  %i) type:%s name:%s location:%i\n", i, GL_type_to_string(type), long_name, location);
+            }
+        } else {
+            int location = glGetAttribLocation(programe, name);
+            printf("  %i) type:%s name:%s location:%i\n", i, GL_type_to_string(type), name, location);
+        }
+    }
+}
+
+
 GLuint get_shader_program() {
     gl_log("\nLoading shaders:\n");
     std::string vertex_shader_file;
@@ -130,6 +161,7 @@ GLuint get_shader_program() {
     glLinkProgram(current_shader);
     check_for_shader_link_error(current_shader);
     show_shader(current_shader);
+    print_all(current_shader);
     return current_shader;
 }
 
@@ -143,7 +175,7 @@ bool uniform_location(GLuint shader_programme, const char * uniform_name,
         gl_log_err("ERROR: shader program %i is not current\n", shader_programme);
         return false;
     }
-    GLuint uniform_location = glGetUniformLocation(shader_programme, "input_color");
-    glUniform4f(uniform_location, 0.0f, 0.0f, 1.0f, 1.0f);
+    GLuint uniform_location = glGetUniformLocation(shader_programme, uniform_name);
+    glUniform4f(uniform_location, r, g, b, alpha);
     return true;
 }

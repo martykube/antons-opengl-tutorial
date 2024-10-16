@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-#include "gllogging.h"
+#include "logging.h"
 
 // window
 int g_window_width = 640;
@@ -138,7 +138,7 @@ int main() {
 
     glClearColor(0.6f, 0.6f, 0.8f, 1.0f);
     while(!glfwWindowShouldClose(window)) {
-        _update_fps_counter(window);
+        // _update_fps_counter(window);
         // wipe the drawing surface clear
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, g_fb_width, g_fb_height);

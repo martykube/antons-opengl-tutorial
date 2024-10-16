@@ -90,9 +90,9 @@ int main() {
     // points
     float size = 0.2;
     GLfloat points [] = {
-         size,  size, 0.0f,
+         0.0f,  size, 0.0f,
+         size, -size, 0.0f,
         -size, -size, 0.0f,
-        -size,  size, 0.0f,
     };
 
     GLuint vbo = 0;
